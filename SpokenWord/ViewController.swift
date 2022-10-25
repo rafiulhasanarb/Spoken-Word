@@ -11,7 +11,7 @@ import Speech
 import CallKit
 import AVFoundation
 
-public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
+public class ViewController: UIViewController {
     // MARK: Properties
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -149,18 +149,7 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
         recognitionTask = nil
         recordButton.isEnabled = false
     }
-    
-    // MARK: SFSpeechRecognizerDelegate
-    public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
-        if available {
-            recordButton.isEnabled = true
-            recordButton.setTitle("Start Recording", for: [])
-        } else {
-            recordButton.isEnabled = false
-            recordButton.setTitle("Recognition Not Available", for: .disabled)
-        }
-    }
-    
+
     // MARK: Interface Builder actions
     @IBAction func recordButtonTapped() {
         if audioEngine.isRunning {
@@ -179,7 +168,7 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     }
 }
 
-extension ViewController {
+extension ViewController: SFSpeechRecognizerDelegate {
     func saySpeechSynthesizer(text: String) {
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
@@ -192,6 +181,17 @@ extension ViewController {
             DispatchQueue.main.async {
                 self.synthesizer.speak(utterance)
             }
+        }
+    }
+    
+    // MARK: SFSpeechRecognizerDelegate
+    public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
+        if available {
+            recordButton.isEnabled = true
+            recordButton.setTitle("Start Recording", for: [])
+        } else {
+            recordButton.isEnabled = false
+            recordButton.setTitle("Recognition Not Available", for: .disabled)
         }
     }
 }
